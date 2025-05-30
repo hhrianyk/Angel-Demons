@@ -1,0 +1,7 @@
+{
+  "name": "web-ar-scanner",
+  "version": "1.0.0",
+  "dependencies": {
+    "mind-ar-js-image-target-compiler": "^1.2.0"
+  }
+}

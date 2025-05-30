@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="upload-container">
+    <h2>Upload Target Image</h2>
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+        <div class="form-group">
+            <label for="file">Select image (PNG, JPG):</label>
+            <input type="file" name="file" id="file" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-upload">Compile for AR</button>
+    </form>
+
+    <div class="requirements">
+        <h3>Image Requirements:</h3>
+        <ul>
+            <li>High contrast patterns work best</li>
+            <li>Minimum size: 500x500 pixels</li>
+            <li>Avoid repetitive patterns</li>
+            <li>File size limit: 16MB</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

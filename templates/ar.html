@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}AR Перегляд | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="ar-section">
+    <div class="container">
+        <h1>AR Перегляд наших десертів</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="ar-alerts">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="ar-content">
+            <p>Оберіть режим AR перегляду:</p>
+
+            <div class="ar-options">
+                <a href="{{ url_for('full_ar_view') }}" class="btn btn-ar">
+                    <i class="fas fa-vr-cardboard"></i> Повноцінний AR режим
+                </a>
+
+                <button class="btn btn-ar" id="simpleArBtn">
+                    <i class="fas fa-mobile-alt"></i> Швидкий перегляд
+                </button>
+            </div>
+
+            <div class="ar-instructions">
+                <h3>Як це працює?</h3>
+                <ol>
+                    <li>Оберіть режим AR</li>
+                    <li>Наведіть камеру на QR-код у закладі</li>
+                    <li>Насолоджуйтесь 3D моделями наших десертів</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function startSimpleAR() {
+    // Тут можна реалізувати простий AR без міток
+    alert('Швидкий перегляд у розробці. Спробуйте повноцінний AR.');
+}
+</script>
+{% endblock %}

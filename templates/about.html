@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Про нас | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="about-section">
+    <div class="container">
+        <div class="about-container">
+            <div class="about-image">
+                <img src="{{ url_for('static', filename='images/about.jpg') }}" alt="Кафе Angel & Demons">
+            </div>
+            <div class="about-text">
+                <h2>Наша історія</h2>
+                <p>Angel & Demons - це унікальне місце, де поєднуються два світи: ніжність ангельських десертів та інтенсивність демонічних смаків. Наша кондитерська була заснована у 2015 році з мрією створювати неперевершені десерти.</p>
+                <p>Ми використовуємо тільки найкращі інгредієнти та традиційні технології, поєднуючи їх з сучасними трендами кондитерського мистецтва.</p>
+
+                <h2 style="margin-top: 40px;">Наша команда</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/chef1.jpg') }}" alt="Шеф-кондитер" class="member-photo">
+                        <h3>Анна Світлова</h3>
+                        <p>Головний кондитер</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/chef2.jpg') }}" alt="Бариста" class="member-photo">
+                        <h3>Максим Темний</h3>
+                        <p>Головний бариста</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="{{ url_for('static', filename='images/manager.jpg') }}" alt="Менеджер" class="member-photo">
+                        <h3>Ольга Рівнова</h3>
+                        <p>Менеджер</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

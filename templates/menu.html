@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Меню | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="menu-header">
+    <div class="container">
+        <h1>Наше меню</h1>
+        <p>Кожен продукт - це витвір мистецтва у чорно-білій гамі</p>
+    </div>
+</section>
+
+<section class="menu-tabs">
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('desserts')">Десерти</button>
+            <button class="tab-button" onclick="openTab('drinks')">Напої</button>
+        </div>
+    </div>
+</section>
+
+<section class="menu-content">
+    <div class="container">
+        <!-- Вкладка десертів -->
+        <div id="desserts" class="tab-content" style="display: block;">
+            <div class="items-grid">
+                {% for item in menu['Десерти'] %}
+                <div class="menu-item">
+                    <div class="item-image-container">
+                        <img src="{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}"
+                             alt="{{ item['name'] }}" class="item-image">
+                        <div class="item-overlay">
+                            <button class="quick-view" onclick="showQuickView('{{ item['name'] }}', '{{ item['description'] }}', '{{ item['price'] }}', '{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}')">
+                                Швидкий перегляд
+                            </button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <h3>{{ item['name'] }}</h3>
+                        <p class="item-description">{{ item['description'] }}</p>
+                        <div class="item-footer">
+                            <span class="item-price">{{ item['price'] }} грн</span>
+                            <button class="add-to-cart">+ Додати</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Вкладка напоїв -->
+        <div id="drinks" class="tab-content" style="display: none;">
+            <div class="items-grid">
+                {% for item in menu['Напої'] %}
+                <div class="menu-item">
+                    <div class="item-image-container">
+                        <img src="{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}"
+                             alt="{{ item['name'] }}" class="item-image">
+                        <div class="item-overlay">
+                            <button class="quick-view" onclick="showQuickView('{{ item['name'] }}', '{{ item['description'] }}', '{{ item['price'] }}', '{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}')">
+                                Швидкий перегляд
+                            </button>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <h3>{{ item['name'] }}</h3>
+                        <p class="item-description">{{ item['description'] }}</p>
+                        <div class="item-footer">
+                            <span class="item-price">{{ item['price'] }} грн</span>
+                            <button class="add-to-cart">+ Додати</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Модальне вікно для швидкого перегляду -->
+<div id="quickViewModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-body">
+            <div class="modal-image">
+                <img id="modalItemImage" src="" alt="">
+            </div>
+            <div class="modal-info">
+                <h2 id="modalItemName"></h2>
+                <p class="modal-description" id="modalItemDescription"></p>
+                <p class="modal-price" id="modalItemPrice"></p>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-primary">Додати до замовлення</button>
+                    <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Закрити</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Функція для перемикання вкладок
+function openTab(tabName) {
+    // Приховуємо всі вкладки
+    const tabContents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].style.display = 'none';
+    }
+
+    // Видаляємо активний клас у всіх кнопок
+    const tabButtons = document.getElementsByClassName('tab-button');
+    for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+    }
+
+    // Показуємо обрану вкладку
+    document.getElementById(tabName).style.display = 'block';
+
+    // Додаємо активний клас до обраної кнопки
+    event.currentTarget.classList.add('active');
+}
+
+// Функція для відображення швидкого перегляду
+function showQuickView(name, description, price, imageSrc) {
+    document.getElementById('modalItemName').textContent = name;
+    document.getElementById('modalItemDescription').textContent = description;
+    document.getElementById('modalItemPrice').textContent = price + ' грн';
+    document.getElementById('modalItemImage').src = imageSrc;
+    document.getElementById('modalItemImage').alt = name;
+    document.getElementById('quickViewModal').style.display = 'block';
+}
+
+// Функція для закриття модального вікна
+function closeModal() {
+    document.getElementById('quickViewModal').style.display = 'none';
+}
+
+// Закриття модального вікна при кліку поза ним
+window.onclick = function(event) {
+    const modal = document.getElementById('quickViewModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

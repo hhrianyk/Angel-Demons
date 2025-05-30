@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Підтвердження замовлення | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="confirmation-section">
+    <div class="container">
+        <div class="confirmation-card">
+            <h1>Дякуємо за ваше замовлення! 🎉</h1>
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <p class="confirmation-message">
+                Ваше замовлення успішно прийнято. Наш менеджер зв'яжеться з вами найближчим часом для підтвердження.
+            </p>
+            <div class="confirmation-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">На головну</a>
+                <a href="{{ url_for('show_menu') }}" class="btn btn-secondary">Повернутись до меню</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

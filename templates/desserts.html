@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Десерти | CafeWeb{% endblock %}
+
+{% block content %}
+<section class="menu-header">
+    <div class="container">
+        <h1>Десерти</h1>
+        <p>Чорно-білі солодощі для витончених смаків</p>
+    </div>
+</section>
+
+<section class="menu-items">
+    <div class="container">
+        <div class="items-grid">
+            {% for name, details in items.items() %}
+            <div class="menu-item">
+                <div class="item-image"></div>
+                <div class="item-details">
+                    <h3>{{ name }}</h3>
+                    <p class="item-description">{{ details['description'] }}</p>
+                    <p class="item-price">{{ details['price'] }} грн</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="menu-actions">
+            <a href="{{ url_for('order') }}" class="btn">Замовити</a>
+            <a href="{{ url_for('show_menu') }}" class="btn-outline">Повернутись до меню</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

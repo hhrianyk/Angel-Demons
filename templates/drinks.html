@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Напої | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="menu-header">
+    <div class="container">
+        <h1>Напої</h1>
+        <p>Чорно-білі смаки у чашці</p>
+    </div>
+</section>
+
+<section class="menu-items">
+    <div class="container">
+        <div class="items-grid">
+            {% for item in items %}
+            <div class="menu-item">
+                <div class="item-image" style="background: linear-gradient(45deg, #ffffff 50%, #000000 50%);"></div>
+                <div class="item-details">
+                    <h3>{{ item.name }}</h3>
+                    <p class="item-description">{{ item.description }}</p>
+                    <p class="item-price">{{ item.price }} грн</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="menu-actions">
+            <a href="{{ url_for('order') }}" class="btn">Замовити</a>
+            <a href="{{ url_for('show_menu') }}" class="btn-outline">Повернутись до меню</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

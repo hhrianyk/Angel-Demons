@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Замовлення | Angel & Demons{% endblock %}
+
+{% block content %}
+<section class="order-section">
+  <div class="order-container">
+    <div class="order-header">
+      <h1>Оформлення замовлення</h1>
+      <p>Заповніть форму і ми зв'яжемося з вами для підтвердження</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('order') }}" class="order-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Ваше ім'я*</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Номер телефону*</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Адреса доставки</label>
+        <input type="text" id="address" name="address">
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Особливі побажання</label>
+        <textarea id="notes" name="notes" rows="3"></textarea>
+      </div>
+
+      <div class="menu-category">
+        <h3 class="category-title">Десерти</h3>
+        <div class="menu-items">
+          {% for item in menu['Десерти'] %}
+          <div class="menu-item-card">
+            <div class="item-info">
+              <div class="item-name">{{ item['name'] }}</div>
+              <div class="item-description">{{ item['description'] }}</div>
+            </div>
+            <div class="item-price">{{ item['price'] }} грн</div>
+            <div class="item-quantity">
+              <button type="button" class="quantity-btn minus">-</button>
+              <input type="number" name="quantity-{{ item['id'] }}" value="0" min="0" class="quantity-input">
+              <button type="button" class="quantity-btn plus">+</button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="menu-category">
+        <h3 class="category-title">Напої</h3>
+        <div class="menu-items">
+          {% for item in menu['Напої'] %}
+          <div class="menu-item-card">
+            <div class="item-info">
+              <div class="item-name">{{ item['name'] }}</div>
+              <div class="item-description">{{ item['description'] }}</div>
+            </div>
+            <div class="item-price">{{ item['price'] }} грн</div>
+            <div class="item-quantity">
+              <button type="button" class="quantity-btn minus">-</button>
+              <input type="number" name="quantity-{{ item['id'] }}" value="0" min="0" class="quantity-input">
+              <button type="button" class="quantity-btn plus">+</button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="submit-btn-container">
+        <button type="submit" class="submit-btn">Замовити</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+// Обробка кнопок +/-
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.quantity-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = this.parentElement.querySelector('.quantity-input');
+      let value = parseInt(input.value) || 0;
+
+      if (this.classList.contains('plus')) {
+        value++;
+      } else {
+        value = value > 0 ? value - 1 : 0;
+      }
+
+      input.value = value;
+    });
+  });
+});
+</script>
+{% endblock %}
