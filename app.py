@@ -260,5 +260,6 @@ def order_confirmation():
 if __name__ == '__main__':
     # Видаляємо та перестворюємо базу даних при кожному запуску під час розробки
     #init_db()
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)  # debug=False для ngrok
 
