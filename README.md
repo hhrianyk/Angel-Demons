@@ -174,8 +174,7 @@ flask run --debug
 
 Цей проєкт ліцензовано під MIT License. Деталі — у файлі `LICENSE`.
 
-© 2023 Angel & Demons Cafe. Усі права захищені.
+© 2025 Angel & Demons Cafe. Усі права захищені.
 
 ---
 
-> Якщо бажаєте — я можу додати шаблони для `.env`, Dockerfile або CI/CD.
