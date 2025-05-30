@@ -260,5 +260,5 @@ def order_confirmation():
 if __name__ == '__main__':
     # Видаляємо та перестворюємо базу даних при кожному запуску під час розробки
     #init_db()
-    app.run(debug=True)
+    app.run()
 
