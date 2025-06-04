@@ -134,7 +134,7 @@ cafeweb/
 ## 🗃️ Структура Бази Даних
 
 ```mermaid
-erDiagram
+ Diagram
     CATEGORIES ||--o{ MENU_ITEMS : contains
     ORDERS ||--o{ ORDER_ITEMS : has
     USERS ||--o{ ORDERS : places
