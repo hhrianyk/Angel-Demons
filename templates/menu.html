@@ -27,8 +27,8 @@
                 {% for item in menu['Десерти'] %}
                 <div class="menu-item">
                     <div class="item-image-container">
-                        <img src="{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}"
-                             alt="{{ item['name'] }}" class="item-image">
+                        <img src="{{ url_for('static', filename='images/menu/' + item['image_name']) }}"
+                            alt="{{ item['name'] }}" class="item-image">
                         <div class="item-overlay">
                             <button class="quick-view" onclick="showQuickView('{{ item['name'] }}', '{{ item['description'] }}', '{{ item['price'] }}', '{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}')">
                                 Швидкий перегляд

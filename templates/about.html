@@ -3,6 +3,77 @@
 {% block title %}Про нас | Angel & Demons{% endblock %}
 
 {% block content %}
+<style>
+    .member-photo {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .about-section {
+        padding: 40px 0;
+    }
+
+    .about-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .about-image img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+    }
+
+    .about-text h2 {
+        margin-top: 0;
+        color: #444;
+    }
+
+    .about-text p {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .team-grid {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .team-member {
+        text-align: center;
+        max-width: 150px;
+    }
+
+    .team-member h3 {
+        margin: 10px 0 5px;
+        font-size: 18px;
+    }
+
+    .team-member p {
+        font-size: 14px;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .team-grid {
+            justify-content: center;
+        }
+
+        .about-container {
+            align-items: center;
+        }
+    }
+</style>
+
 <section class="about-section">
     <div class="container">
         <div class="about-container">
@@ -11,25 +82,25 @@
             </div>
             <div class="about-text">
                 <h2>Наша історія</h2>
-                <p>Angel & Demons - це унікальне місце, де поєднуються два світи: ніжність ангельських десертів та інтенсивність демонічних смаків. Наша кондитерська була заснована у 2015 році з мрією створювати неперевершені десерти.</p>
+                <p>Angel & Demons - це унікальне місце, де поєднуються два світи: ніжність ангельських десертів та інтенсивність демонічних смаків. Наша кондитерська була заснована у 2023 році з мрією створювати неперевершені десерти.</p>
                 <p>Ми використовуємо тільки найкращі інгредієнти та традиційні технології, поєднуючи їх з сучасними трендами кондитерського мистецтва.</p>
 
                 <h2 style="margin-top: 40px;">Наша команда</h2>
                 <div class="team-grid">
                     <div class="team-member">
                         <img src="{{ url_for('static', filename='images/chef1.jpg') }}" alt="Шеф-кондитер" class="member-photo">
-                        <h3>Анна Світлова</h3>
+                        <h3>Єлизавета Бондаренко</h3>
                         <p>Головний кондитер</p>
                     </div>
                     <div class="team-member">
                         <img src="{{ url_for('static', filename='images/chef2.jpg') }}" alt="Бариста" class="member-photo">
-                        <h3>Максим Темний</h3>
-                        <p>Головний бариста</p>
+                        <h3>Олена Черних</h3>
+                        <p>Головний Менеджер</p>
                     </div>
                     <div class="team-member">
                         <img src="{{ url_for('static', filename='images/manager.jpg') }}" alt="Менеджер" class="member-photo">
-                        <h3>Ольга Рівнова</h3>
-                        <p>Менеджер</p>
+                        <h3>Імя Прізвище</h3>
+                        <p>Третій робітник</p>
                     </div>
                 </div>
             </div>

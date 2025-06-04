@@ -19,7 +19,12 @@ def init_db():
                   name TEXT NOT NULL,
                   description TEXT,
                   price REAL NOT NULL,
+                  image_name TEXT,  # Новий стовпець для імені файлу зображення
                   FOREIGN KEY (category_id) REFERENCES categories (id))''')
+
+    # Оновлюємо тестові дані
+    c.execute("INSERT INTO menu_items (category_id, name, description, price, image_name) VALUES (?, ?, ?, ?, ?)",
+              (1, 'Чорний макарон', 'Ніжний макарон з чорним шоколадом', 65, 'black_macaron.jpg'))
 
     # Створення таблиці замовлень
     c.execute('''CREATE TABLE IF NOT EXISTS orders

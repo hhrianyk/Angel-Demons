@@ -12,9 +12,10 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Telegram налаштування
 TELEGRAM_TOKEN = '7663765318:AAGcWrl-MlL8bdJnvRZuFaQan9Sv7bPoWI4'
-TELEGRAM_CHAT_ID = ['982150223']
+TELEGRAM_CHAT_ID = ['982150223','921170769']
 ADMIN_USER_IDS = set()
-
+app.config['UPLOAD_FOLDER'] = 'static/images/menu'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 def init_db():
     """Повністю перестворює базу даних з правильною структурою"""
@@ -30,13 +31,18 @@ def init_db():
                   name TEXT NOT NULL,
                   description TEXT)''')
 
-    c.execute('''CREATE TABLE menu_items
+    c.execute('''CREATE TABLE IF NOT EXISTS menu_items
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   category_id INTEGER NOT NULL,
                   name TEXT NOT NULL,
                   description TEXT,
                   price REAL NOT NULL,
+                  image_name TEXT,  # Новий стовпець для імені файлу зображення
                   FOREIGN KEY (category_id) REFERENCES categories (id))''')
+
+    # Оновлюємо тестові дані
+    c.execute("INSERT INTO menu_items (category_id, name, description, price, image_name) VALUES (?, ?, ?, ?, ?)",
+              (1, 'Чорний макарон', 'Ніжний макарон з чорним шоколадом', 65, 'black_macaron.jpg'))
 
     c.execute('''CREATE TABLE orders
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,14 +67,25 @@ def init_db():
     c.execute("INSERT INTO categories (name, description) VALUES (?, ?)",
               ('Напої', 'Гарячі та холодні напої з контрастними смаками'))
 
-    c.execute("INSERT INTO menu_items (category_id, name, description, price) VALUES (?, ?, ?, ?)",
-              (1, 'Чорний макарон', 'Ніжний макарон з чорним шоколадом', 65))
-    c.execute("INSERT INTO menu_items (category_id, name, description, price) VALUES (?, ?, ?, ?)",
-              (1, 'Білий фондан', 'Фондан з білого шоколаду з малиновим соусом', 75))
-    c.execute("INSERT INTO menu_items (category_id, name, description, price) VALUES (?, ?, ?, ?)",
-              (2, 'Еспресо Демона', 'Міцний еспресо з чорною карамеллю', 55))
-    c.execute("INSERT INTO menu_items (category_id, name, description, price) VALUES (?, ?, ?, ?)",
-              (2, 'Ангельський лате', 'Ніжний лате з квітковим ароматом', 60))
+    # Десерти з зображеннями
+    c.execute("""INSERT INTO menu_items 
+                 (category_id, name, description, price, image_name) 
+                 VALUES (?, ?, ?, ?, ?)""",
+              (1, 'Чорний макарон', 'Ніжний макарон з чорним шоколадом', 65, 'black_macaron.jpg'))
+    c.execute("""INSERT INTO menu_items 
+                 (category_id, name, description, price, image_name) 
+                 VALUES (?, ?, ?, ?, ?)""",
+              (1, 'Білий фондан', 'Фондан з білого шоколаду з малиновим соусом', 75, 'white_fondant.jpg'))
+
+    # Напої з зображеннями
+    c.execute("""INSERT INTO menu_items 
+                 (category_id, name, description, price, image_name) 
+                 VALUES (?, ?, ?, ?, ?)""",
+              (2, 'Еспресо Демона', 'Міцний еспресо з чорною карамеллю', 55, 'demon_espresso.jpg'))
+    c.execute("""INSERT INTO menu_items 
+                 (category_id, name, description, price, image_name) 
+                 VALUES (?, ?, ?, ?, ?)""",
+              (2, 'Ангельський лате', 'Ніжний лате з квітковим ароматом', 60, 'angel_latte.jpg'))
 
     conn.commit()
     conn.close()
@@ -82,14 +99,13 @@ def get_db():
 
 
 def get_menu():
-    """Отримання меню з бази даних"""
     conn = get_db()
     menu = {}
 
     categories = conn.execute("SELECT * FROM categories").fetchall()
     for category in categories:
         items = conn.execute(
-            "SELECT * FROM menu_items WHERE category_id = ?",
+            "SELECT id, name, description, price, COALESCE(image_name, 'angel_default.jpg') as image_name FROM menu_items WHERE category_id = ?",
             (category['id'],)
         ).fetchall()
         menu[category['name']] = items
@@ -97,6 +113,10 @@ def get_menu():
     conn.close()
     return menu
 
+# В app.py
+@app.route('/images/menu/<filename>')
+def serve_menu_image(filename):
+    return send_from_directory('static/images/menu', filename)
 
 def send_telegram_notification(order_data):
     """Надсилання сповіщення в Telegram"""
