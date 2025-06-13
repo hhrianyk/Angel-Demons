@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-form">
+        <h1>Оформлення замовлення</h1>
+        
+        <div class="order-summary">
+            <h3>Ваше замовлення:</h3>
+            <ul>
+                {% for item in cart_items %}
+                <li>{{ item.name }} - {{ item.quantity }} × {{ item.price }} грн = {{ item.price * item.quantity }} грн</li>
+                {% endfor %}
+            </ul>
+            <p class="total">Загальна сума: <strong>{{ total }} грн</strong></p>
+        </div>
+
+        <form method="POST" action="{{ url_for('handle_checkout') }}">
+            <div class="form-group">
+                <label for="name">Ім'я:</label>
+                <input type="text" id="name" name="name" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" required class="form-control" pattern="[0-9]{10}" title="Введіть 10 цифр номера телефону">
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Адреса доставки:</label>
+                <input type="text" id="address" name="address" required class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="comments">Коментар до замовлення:</label>
+                <textarea id="comments" name="comments" class="form-control"></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary submit-btn">Підтвердити замовлення</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.checkout-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 15px;
+}
+
+.checkout-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.checkout-form h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #e91e63;
+}
+
+.order-summary h3 {
+    margin-top: 0;
+    color: #444;
+}
+
+.order-summary ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.order-summary li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.total {
+    text-align: right;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+.form-control:focus {
+    border-color: #e91e63;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(233,30,99,0.1);
+}
+
+.submit-btn {
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #c2185b;
+}
+
+@media (max-width: 576px) {
+    .checkout-form {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}

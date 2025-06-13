@@ -1,11 +1,25 @@
 import sqlite3
 from datetime import datetime
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def init_db():
     conn = sqlite3.connect('cafe.db')
     c = conn.cursor()
     print("Start")
+    # Створюємо таблиці з правильною структурою
+    c.execute('''CREATE TABLE users
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      username TEXT NOT NULL UNIQUE,
+                      email TEXT NOT NULL UNIQUE,
+                      password_hash TEXT NOT NULL,
+                      phone TEXT,
+                      created_at TEXT NOT NULL,
+                      is_admin BOOLEAN DEFAULT FALSE)''')
+
+    c.execute('''CREATE TABLE categories
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      name TEXT NOT NULL,
+                      description TEXT)''')
     # Створення таблиці категорій
     c.execute('''CREATE TABLE IF NOT EXISTS categories
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,4 +163,50 @@ def save_order(customer_name, phone, items, total):
 
     conn.commit()
     conn.close()
-init_db()
+
+
+def create_user(username, email, password, phone=None):
+    """Створення нового користувача"""
+    conn = sqlite3.connect('cafe.db')
+    c = conn.cursor()
+
+    # Хешування паролю
+    password_hash = generate_password_hash(password)
+
+    try:
+        c.execute("INSERT INTO users (username, email, password_hash, phone, created_at) VALUES (?, ?, ?, ?, ?)",
+                  (username, email, password_hash, phone, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False  # Користувач з таким ім'ям або email вже існує
+    finally:
+        conn.close()
+
+
+def get_user_by_username(username):
+    """Отримання користувача за ім'ям"""
+    conn = sqlite3.connect('cafe.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = c.fetchone()
+    conn.close()
+    return user
+# Допоміжні функції для роботи з БД
+def get_db():
+    """Підключення до бази даних"""
+    conn = sqlite3.connect('cafe.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def verify_user(username, password):
+    """Перевірка логіну та паролю"""
+    conn = get_db()
+    user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+    conn.close()
+
+    if user and check_password_hash(user['password_hash'], password):
+        return user
+    return None

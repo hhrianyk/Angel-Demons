@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-form-container">
+    <h1>Редагувати пункт меню</h1>
+    
+    <form method="POST" enctype="multipart/form-data" class="menu-form">
+        <div class="form-group">
+            <label for="category_id">Категорія:</label>
+            <select id="category_id" name="category_id" class="form-control" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == item.category_id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="name">Назва:</label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ item.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Опис:</label>
+            <textarea id="description" name="description" class="form-control" rows="3">{{ item.description }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="price">Ціна (грн):</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" class="form-control" value="{{ item.price }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Поточне зображення:</label>
+            {% if item.image_name %}
+            <div class="current-image">
+                <img src="{{ url_for('static', filename='images/menu/' + item.image_name) }}" alt="{{ item.name }}" style="max-width: 200px;">
+                <div class="form-check mt-2">
+                    <input type="checkbox" id="remove_image" name="remove_image" class="form-check-input">
+                    <label for="remove_image" class="form-check-label">Видалити це зображення</label>
+                </div>
+            </div>
+            {% else %}
+            <p>Зображення відсутнє</p>
+            {% endif %}
+
+            <label for="image" class="mt-3">Нове зображення:</label>
+            <input type="file" id="image" name="image" class="form-control-file">
+            <small class="form-text text-muted">Дозволені формати: .jpg, .jpeg, .png, .gif</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+            <a href="{{ url_for('admin_menu') }}" class="btn btn-secondary">Скасувати</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.admin-form-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.menu-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.current-image {
+    margin-bottom: 15px;
+}
+
+.form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
+{% endblock %}

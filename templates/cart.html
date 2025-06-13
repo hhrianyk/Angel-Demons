@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="receipt-container">
+    <div class="receipt">
+        <header class="receipt-header">
+            <h1>Ваш чек</h1>
+            <div class="receipt-meta">
+                <p>№ {{ "%05d" | format(random_number) if random_number else "00000" }}</p>
+                <p>{{ now.strftime('%d.%m.%Y %H:%M') if now else "13.06.2025 00:00" }}</p>
+            </div>
+        </header>
+
+        {% if not cart_items %}
+        <div class="receipt-empty">
+            <p>Ваш кошик порожній</p>
+            <a href="{{ url_for('menu') }}" class="btn btn-outline-primary">Повернутись до меню</a>
+        </div>
+        {% else %}
+        <div class="receipt-items">
+            {% for item in cart_items %}
+            <div class="receipt-item">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-quantity">
+                    <form action="{{ url_for('update_cart_item') }}" method="POST" class="quantity-form">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="button" class="quantity-btn minus" onclick="updateQuantity(this, -1)">-</button>
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input"
+                               onchange="this.form.submit()">
+                        <button type="button" class="quantity-btn plus" onclick="updateQuantity(this, 1)">+</button>
+                    </form>
+                    × {{ item.price }} грн
+                </div>
+                <div class="item-total">{{ item.price * item.quantity }} грн</div>
+                <form action="{{ url_for('remove_from_cart') }}" method="POST" class="item-remove">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit" class="remove-btn">✕</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="receipt-total">
+            <div class="total-line">
+                <span>Загальна сума:</span>
+                <span>{{ total }} грн</span>
+            </div>
+        </div>
+
+        <div class="receipt-actions">
+            <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary">Продовжити покупки</a>
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary">Оформити замовлення</a>
+        </div>
+        {% endif %}
+
+        <footer class="receipt-footer">
+            <p>Дякуємо за покупку!</p>
+            <p>Зворотній зв'язок: {{ contact_email or "support@example.com" }}</p>
+        </footer>
+    </div>
+</div>
+
+<style>
+.receipt-container {
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: 'Courier New', monospace;
+}
+
+.receipt {
+    background: white;
+    padding: 30px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-top: 4px dashed #333;
+    border-bottom: 4px dashed #333;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.receipt-header h1 {
+    font-size: 24px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.receipt-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.receipt-empty {
+    text-align: center;
+    padding: 30px 0;
+    color: #666;
+}
+
+.receipt-items {
+    margin-bottom: 20px;
+}
+
+.receipt-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dotted #ddd;
+    position: relative;
+}
+
+.item-name {
+    flex: 2;
+    font-weight: bold;
+}
+
+.item-quantity {
+    flex: 1;
+    text-align: right;
+    padding-right: 10px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.quantity-form {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 5px;
+}
+
+.quantity-btn {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.quantity-input {
+    width: 30px;
+    height: 25px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
+    margin: 0 -1px;
+}
+
+.item-total {
+    flex: 1;
+    text-align: right;
+    font-weight: bold;
+}
+
+.item-remove {
+    margin-left: 10px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
+}
+
+.receipt-total {
+    margin-top: 15px;
+    border-top: 2px solid #333;
+    padding-top: 10px;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.receipt-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.receipt-footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+@media print {
+    .receipt-container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .receipt {
+        box-shadow: none;
+        border: none;
+        padding: 10px;
+    }
+
+    .receipt-actions, .remove-btn, .quantity-btn {
+        display: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .receipt {
+        padding: 15px;
+    }
+
+    .receipt-item {
+        flex-wrap: wrap;
+    }
+
+    .item-name {
+        flex: 100%;
+        margin-bottom: 5px;
+    }
+
+    .item-quantity {
+        justify-content: flex-start;
+        padding-right: 0;
+    }
+}
+</style>
+
+<script>
+function updateQuantity(button, change) {
+    const form = button.closest('.quantity-form');
+    const input = form.querySelector('.quantity-input');
+    const newValue = parseInt(input.value) + change;
+
+    if (newValue >= 1) {
+        input.value = newValue;
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

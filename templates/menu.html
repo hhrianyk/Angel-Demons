@@ -1,146 +1,492 @@
 {% extends "base.html" %}
 
-{% block title %}Меню | Angel & Demons{% endblock %}
-
 {% block content %}
-<section class="menu-header">
-    <div class="container">
+<div class="menu-page">
+    <!-- Заголовок та фільтри -->
+    <div class="menu-header">
         <h1>Наше меню</h1>
-        <p>Кожен продукт - це витвір мистецтва у чорно-білій гамі</p>
-    </div>
-</section>
-
-<section class="menu-tabs">
-    <div class="container">
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('desserts')">Десерти</button>
-            <button class="tab-button" onclick="openTab('drinks')">Напої</button>
+        <div class="category-filters">
+            <button class="filter-btn active" data-category="all">Всі страви</button>
+            {% for category in categories %}
+            <button class="filter-btn" data-category="{{ category.id }}">{{ category.name }}</button>
+            {% endfor %}
         </div>
     </div>
-</section>
 
-<section class="menu-content">
-    <div class="container">
-        <!-- Вкладка десертів -->
-        <div id="desserts" class="tab-content" style="display: block;">
-            <div class="items-grid">
-                {% for item in menu['Десерти'] %}
-                <div class="menu-item">
-                    <div class="item-image-container">
-                        <img src="{{ url_for('static', filename='images/menu/' + item['image_name']) }}"
-                            alt="{{ item['name'] }}" class="item-image">
-                        <div class="item-overlay">
-                            <button class="quick-view" onclick="showQuickView('{{ item['name'] }}', '{{ item['description'] }}', '{{ item['price'] }}', '{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}')">
-                                Швидкий перегляд
-                            </button>
-                        </div>
-                    </div>
-                    <div class="item-details">
-                        <h3>{{ item['name'] }}</h3>
-                        <p class="item-description">{{ item['description'] }}</p>
-                        <div class="item-footer">
-                            <span class="item-price">{{ item['price'] }} грн</span>
-                            <button class="add-to-cart">+ Додати</button>
-                        </div>
-                    </div>
+    <!-- Список страв -->
+    <div class="menu-items">
+        {% for category in categories %}
+        {% for item in category.products %}
+        <div class="menu-item" data-category="{{ category.id }}">
+            <div class="item-image">
+                <img src="{{ url_for('static', filename='images/menu/' + (item.image if item.image else 'placeholder.jpg')) }}"
+                     alt="{{ item.name }}"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+            </div>
+            <div class="item-info">
+                <div class="item-header">
+                    <h3>{{ item.name }}</h3>
+                    <button class="favorite-btn" data-item-id="{{ item.id }}">
+                        <i class="far fa-heart"></i>
+                    </button>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Вкладка напоїв -->
-        <div id="drinks" class="tab-content" style="display: none;">
-            <div class="items-grid">
-                {% for item in menu['Напої'] %}
-                <div class="menu-item">
-                    <div class="item-image-container">
-                        <img src="{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}"
-                             alt="{{ item['name'] }}" class="item-image">
-                        <div class="item-overlay">
-                            <button class="quick-view" onclick="showQuickView('{{ item['name'] }}', '{{ item['description'] }}', '{{ item['price'] }}', '{{ url_for('static', filename='images/' + (item['image_name'] if item['image_name'] else 'angel_default.jpg')) }}')">
-                                Швидкий перегляд
-                            </button>
-                        </div>
+                <p class="description">{{ item.description }}</p>
+                <div class="item-footer">
+                    <span class="price">{{ item.price }} грн</span>
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus">-</button>
+                        <input type="number" class="quantity-input" value="1" min="1">
+                        <button class="quantity-btn plus">+</button>
                     </div>
-                    <div class="item-details">
-                        <h3>{{ item['name'] }}</h3>
-                        <p class="item-description">{{ item['description'] }}</p>
-                        <div class="item-footer">
-                            <span class="item-price">{{ item['price'] }} грн</span>
-                            <button class="add-to-cart">+ Додати</button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Модальне вікно для швидкого перегляду -->
-<div id="quickViewModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal()">&times;</span>
-        <div class="modal-body">
-            <div class="modal-image">
-                <img id="modalItemImage" src="" alt="">
-            </div>
-            <div class="modal-info">
-                <h2 id="modalItemName"></h2>
-                <p class="modal-description" id="modalItemDescription"></p>
-                <p class="modal-price" id="modalItemPrice"></p>
-                <div class="modal-actions">
-                    <button class="modal-btn modal-btn-primary">Додати до замовлення</button>
-                    <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Закрити</button>
+                    <button class="add-to-cart-btn" data-item-id="{{ item.id }}">
+                        <i class="fas fa-cart-plus"></i> Додати
+                    </button>
                 </div>
             </div>
         </div>
+        {% endfor %}
+        {% endfor %}
     </div>
+
+    <!-- Сповіщення -->
+    <div id="notification" class="notification"></div>
 </div>
 
+<style>
+/* Основні стилі */
+.menu-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.menu-header h1 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+}
+
+/* Фільтри категорій */
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.filter-btn.active {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
+
+/* Список страв */
+.menu-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.menu-item {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.item-image {
+    height: 200px;
+    overflow: hidden;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.menu-item:hover .item-image img {
+    transform: scale(1.05);
+}
+
+.item-info {
+    padding: 15px;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.item-info h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ccc;
+    transition: all 0.3s;
+    padding: 5px;
+}
+
+.favorite-btn.active {
+    color: #e74c3c;
+}
+
+.favorite-btn .fa-heart {
+    transition: transform 0.2s;
+}
+
+.favorite-btn:hover .fa-heart {
+    transform: scale(1.1);
+}
+
+.description {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px 15px;
+}
+
+.price {
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 1.1rem;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.quantity-input {
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    border-left: none;
+    border-right: none;
+}
+
+.add-to-cart-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.add-to-cart-btn:hover {
+    background: #c0392b;
+}
+
+/* Сповіщення */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #27ae60;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.error {
+    background: #e74c3c;
+}
+
+.notification.warning {
+    background: #f39c12;
+}
+
+/* Анімації */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 0.5s;
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .menu-items {
+        grid-template-columns: 1fr;
+    }
+
+    .category-filters {
+        overflow-x: auto;
+        padding-bottom: 10px;
+        justify-content: flex-start;
+    }
+
+    .item-footer {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .price {
+        order: 1;
+    }
+
+    .quantity-control {
+        order: 2;
+        margin: 0;
+    }
+
+    .add-to-cart-btn {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
 <script>
-// Функція для перемикання вкладок
-function openTab(tabName) {
-    // Приховуємо всі вкладки
-    const tabContents = document.getElementsByClassName('tab-content');
-    for (let i = 0; i < tabContents.length; i++) {
-        tabContents[i].style.display = 'none';
+// Глобальні змінні
+let userFavorites = new Set();
+
+// Фільтрація меню
+function setupFilterButtons() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-category');
+
+            // Оновлюємо активну кнопку
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Фільтруємо страви
+            document.querySelectorAll('.menu-item').forEach(item => {
+                if (categoryId === 'all' || item.getAttribute('data-category') === categoryId) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+}
+
+// Керування кількістю
+function setupQuantityControls() {
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('.quantity-input');
+            const change = this.classList.contains('plus') ? 1 : -1;
+            const newValue = parseInt(input.value) + change;
+            if (newValue >= 1) {
+                input.value = newValue;
+            }
+        });
+    });
+}
+
+// Додавання в кошик
+function setupAddToCartButtons() {
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const quantity = parseInt(this.closest('.item-footer').querySelector('.quantity-input').value);
+
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: itemId,
+                    quantity: quantity
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // Оновлюємо лічильник кошика
+                    document.querySelectorAll('.cart-count').forEach(el => {
+                        el.textContent = data.cart_count;
+                        el.classList.add('pulse');
+                        setTimeout(() => el.classList.remove('pulse'), 500);
+                    });
+
+                    // Показуємо сповіщення
+                    showNotification('Товар додано до кошика');
+
+                    // Анімуємо кнопку
+                    this.classList.add('pulse');
+                    setTimeout(() => this.classList.remove('pulse'), 500);
+                } else {
+                    showNotification(data.message || 'Помилка при додаванні', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Помилка при додаванні до кошика', 'error');
+            });
+        });
+    });
+}
+
+// Улюблені товари
+async function loadUserFavorites() {
+    try {
+        {% if current_user.is_authenticated %}
+        const response = await fetch('/get_user_favorites');
+        if (!response.ok) throw new Error('Network error');
+        const favorites = await response.json();
+
+        userFavorites = new Set(favorites);
+
+        // Оновлюємо всі кнопки улюблених
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const itemId = btn.getAttribute('data-item-id');
+            if (userFavorites.has(itemId)) {
+                btn.classList.add('active');
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.classList.replace('far', 'fas');
+                }
+            }
+        });
+        {% endif %}
+    } catch (error) {
+        console.error('Failed to load favorites:', error);
     }
-
-    // Видаляємо активний клас у всіх кнопок
-    const tabButtons = document.getElementsByClassName('tab-button');
-    for (let i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].classList.remove('active');
-    }
-
-    // Показуємо обрану вкладку
-    document.getElementById(tabName).style.display = 'block';
-
-    // Додаємо активний клас до обраної кнопки
-    event.currentTarget.classList.add('active');
 }
 
-// Функція для відображення швидкого перегляду
-function showQuickView(name, description, price, imageSrc) {
-    document.getElementById('modalItemName').textContent = name;
-    document.getElementById('modalItemDescription').textContent = description;
-    document.getElementById('modalItemPrice').textContent = price + ' грн';
-    document.getElementById('modalItemImage').src = imageSrc;
-    document.getElementById('modalItemImage').alt = name;
-    document.getElementById('quickViewModal').style.display = 'block';
+function setupFavoriteButtons() {
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const itemId = this.getAttribute('data-item-id');
+
+            {% if not current_user.is_authenticated %}
+                showNotification('Будь ласка, увійдіть, щоб додавати до улюблених', 'warning');
+                return;
+            {% endif %}
+
+            try {
+                const response = await fetch('/toggle_favorite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `item_id=${itemId}`
+                });
+
+                if (!response.ok) throw new Error('Server error');
+
+                const data = await response.json();
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    if (data.action === 'added') {
+                        this.classList.add('active');
+                        icon.classList.replace('far', 'fas');
+                        userFavorites.add(itemId);
+                        showNotification('Додано до улюблених');
+                    } else {
+                        this.classList.remove('active');
+                        icon.classList.replace('fas', 'far');
+                        userFavorites.delete(itemId);
+                        showNotification('Видалено з улюблених');
+                    }
+                    this.classList.add('pulse');
+                    setTimeout(() => this.classList.remove('pulse'), 500);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Помилка при зміні статусу', 'error');
+            }
+        });
+    });
 }
 
-// Функція для закриття модального вікна
-function closeModal() {
-    document.getElementById('quickViewModal').style.display = 'none';
+// Показ сповіщення
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type} show`;
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
 }
 
-// Закриття модального вікна при кліку поза ним
-window.onclick = function(event) {
-    const modal = document.getElementById('quickViewModal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-}
+// Ініціалізація після завантаження сторінки
+document.addEventListener('DOMContentLoaded', () => {
+    setupFilterButtons();
+    setupQuantityControls();
+    setupAddToCartButtons();
+    setupFavoriteButtons();
+    loadUserFavorites();
+});
 </script>
 {% endblock %}

@@ -1,23 +1,60 @@
 {% extends "base.html" %}
 
-{% block title %}Підтвердження замовлення | Angel & Demons{% endblock %}
-
 {% block content %}
-<section class="confirmation-section">
-    <div class="container">
-        <div class="confirmation-card">
-            <h1>Дякуємо за ваше замовлення! 🎉</h1>
-            <div class="confirmation-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <p class="confirmation-message">
-                Ваше замовлення успішно прийнято. Наш менеджер зв'яжеться з вами найближчим часом для підтвердження.
-            </p>
-            <div class="confirmation-actions">
-                <a href="{{ url_for('index') }}" class="btn btn-primary">На головну</a>
-                <a href="{{ url_for('show_menu') }}" class="btn btn-secondary">Повернутись до меню</a>
-            </div>
+<div class="container confirmation-container">
+    <div class="confirmation-card">
+        <div class="checkmark">✓</div>
+        <h1>Дякуємо за ваше замовлення!</h1>
+        <p>Ваше замовлення успішно оформлено. Наш менеджер зв'яжеться з вами найближчим часом.</p>
+        <div class="confirmation-actions">
+            <a href="{{ url_for('menu') }}" class="btn btn-primary">Повернутись до меню</a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">На головну</a>
         </div>
     </div>
-</section>
+</div>
+
+<style>
+.confirmation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 20px;
+}
+
+.confirmation-card {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.checkmark {
+    color: #28a745;
+    font-size: 60px;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.confirmation-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 576px) {
+    .confirmation-card {
+        padding: 20px;
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+}
+</style>
 {% endblock %}

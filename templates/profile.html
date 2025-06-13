@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- Заголовок -->
+    <div class="profile-header">
+        <h1>Мій профіль</h1>
+        <a href="{{ url_for('edit_profile') }}" class="btn-edit">Редагувати профіль</a>
+    </div>
+
+    <!-- Основна інформація -->
+    <div class="profile-section">
+        <div class="avatar-section">
+            <div class="avatar-container">
+                <img src="{{ url_for('static', filename='images/avatars/' + (user.avatar if user.avatar else 'default.jpg')) }}"
+                     alt="Аватар"
+                     class="avatar-image"
+                     onerror="this.src='{{ url_for('static', filename='images/avatars/default.jpg') }}'">
+            </div>
+            <button class="btn-change-avatar">Змінити фото</button>
+        </div>
+
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-label">Ім'я:</span>
+                <span class="info-value">{{ user.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Телефон:</span>
+                <span class="info-value">{{ user.phone if user.phone else 'Не вказано' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Дата реєстрації:</span>
+                <span class="info-value">{{ user.registration_date[:10] }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Історія замовлень -->
+    <div class="orders-section">
+        <h2>Останні замовлення</h2>
+
+        {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-number">Замовлення #{{ order['id'] }}</span>
+                    <span class="order-date">{{ order['order_date'][:16] }}</span>
+                    <span class="order-status {{ order['status'] }}">{{ order['status']|upper }}</span>
+                </div>
+
+                <div class="order-body">
+                    <p class="order-items">{{ order['items'] }}</p>
+                    <div class="order-total">
+                        <span>Сума:</span>
+                        <span class="total-amount">{{ order['total'] }} грн</span>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <a href="{{ url_for('order_details', order_id=order['id']) }}" class="btn-details">Деталі</a>
+                    {% if order['status'] == 'new' %}
+                    <button class="btn-cancel" onclick="cancelOrder({{ order['id'] }})">Скасувати</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="{{ url_for('order_history') }}" class="view-all">Дивитися всі замовлення →</a>
+        {% else %}
+        <div class="no-orders">
+            <p>У вас ще немає замовлень</p>
+            <a href="{{ url_for('menu') }}" class="btn-menu">Перейти до меню</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Стилі -->
+<style>
+/* Основні стилі */
+.profile-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #2c3e50;
+}
+
+.btn-edit {
+    background: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-edit:hover {
+    background: #2980b9;
+}
+
+/* Секція профілю */
+.profile-section {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+}
+
+.avatar-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #f1f1f1;
+    margin-bottom: 15px;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-change-avatar {
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.info-section {
+    flex: 1;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.info-label {
+    font-weight: bold;
+    width: 150px;
+    color: #7f8c8d;
+}
+
+.info-value {
+    flex: 1;
+}
+
+/* Секція замовлень */
+.orders-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.orders-section h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #2c3e50;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-card {
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.order-number {
+    font-weight: bold;
+}
+
+.order-date {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.order-status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.order-status.new {
+    background: #3498db;
+    color: white;
+}
+
+.order-status.completed {
+    background: #2ecc71;
+    color: white;
+}
+
+.order-status.cancelled {
+    background: #e74c3c;
+    color: white;
+}
+
+.order-body {
+    padding: 15px;
+}
+
+.order-items {
+    margin: 0 0 10px 0;
+    color: #555;
+}
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.total-amount {
+    color: #e74c3c;
+}
+
+.order-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 15px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+    gap: 10px;
+}
+
+.btn-details {
+    background: #3498db;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-cancel {
+    background: #e74c3c;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.view-all {
+    display: inline-block;
+    margin-top: 20px;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 30px;
+}
+
+.no-orders p {
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+.btn-menu {
+    background: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .profile-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .avatar-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        flex-direction: column;
+    }
+
+    .info-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .order-status {
+        margin-top: 5px;
+    }
+}
+</style>
+
+<!-- Скрипти -->
+<script>
+// Функція для скасування замовлення
+function cancelOrder(orderId) {
+    if (confirm('Ви впевнені, що хочете скасувати це замовлення?')) {
+        fetch(`/cancel-order/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Замовлення успішно скасовано', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showNotification(data.message || 'Помилка при скасуванні', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Сталася помилка', 'error');
+        });
+    }
+}
+
+// Функція для показу сповіщень
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+</script>
+
+<!-- Стилі для сповіщень -->
+<style>
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 4px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.success {
+    background: #2ecc71;
+}
+
+.notification.error {
+    background: #e74c3c;
+}
+</style>
+{% endblock %}
